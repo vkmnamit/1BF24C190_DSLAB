@@ -1,0 +1,216 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+
+struct Node* new_node(int value) {
+    struct Node *n = (struct Node*)malloc(sizeof(struct Node));
+    if (!n) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    n->data = value;
+    n->next = NULL;
+    return n;
+}
+
+
+void stack_push(struct Node **head_ref, int value) {
+    struct Node *n = new_node(value);
+    n->next = *head_ref;
+    *head_ref = n;
+}
+
+int stack_pop(struct Node **head_ref, int *success) {
+    if (*head_ref == NULL) {
+        *success = 0;
+        return -1;
+    }
+    struct Node *temp = *head_ref;
+    int val = temp->data;
+    *head_ref = temp->next;
+    free(temp);
+    *success = 1;
+    return val;
+}
+
+int stack_peek(struct Node *head, int *success) {
+    if (head == NULL) {
+        *success = 0;
+        return -1;
+    }
+    *success = 1;
+    return head->data;
+}
+
+
+struct Queue {
+    struct Node *head;
+    struct Node *tail;
+};
+
+void init_queue(struct Queue *q) {
+    q->head = q->tail = NULL;
+}
+
+void enqueue(struct Queue *q, int value) {
+    struct Node *n = new_node(value);
+    if (q->tail == NULL) {
+        q->head = q->tail = n;
+    } else {
+        q->tail->next = n;
+        q->tail = n;
+    }
+}
+
+int dequeue(struct Queue *q, int *success) {
+    if (q->head == NULL) {
+        *success = 0;
+        return -1;
+    }
+    struct Node *temp = q->head;
+    int val = temp->data;
+    q->head = temp->next;
+    if (q->head == NULL)
+        q->tail = NULL;
+    free(temp);
+    *success = 1;
+    return val;
+}
+
+int queue_front(struct Queue *q, int *success) {
+    if (q->head == NULL) {
+        *success = 0;
+        return -1;
+    }
+    *success = 1;
+    return q->head->data;
+}
+
+
+void display_list(struct Node *head) {
+    if (!head) {
+        printf("(empty)\n");
+        return;
+    }
+    struct Node *cur = head;
+    while (cur) {
+        printf("%d -> ", cur->data);
+        cur = cur->next;
+    }
+    printf("NULL\n");
+}
+
+
+void free_list(struct Node *head) {
+    struct Node *cur = head;
+    while (cur) {
+        struct Node *tmp = cur;
+        cur = cur->next;
+        free(tmp);
+    }
+}
+
+void free_queue(struct Queue *q) {
+    free_list(q->head);
+    q->head = q->tail = NULL;
+}
+
+
+int main() {
+    struct Node *stack_head = NULL;
+    struct Queue q;
+    init_queue(&q);
+
+    int choice;
+    while (1) {
+        printf("\n--- Singly Linked List: Stack & Queue (No typedef) ---\n");
+        printf("1) Stack: Push\n");
+        printf("2) Stack: Pop\n");
+        printf("3) Stack: Peek\n");
+        printf("4) Stack: Display\n");
+        printf("5) Queue: Enqueue\n");
+        printf("6) Queue: Dequeue\n");
+        printf("7) Queue: Front\n");
+        printf("8) Queue: Display\n");
+        printf("9) Exit\n");
+        printf("Choose an option: ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Exiting.\n");
+            break;
+        }
+
+        int x, ok;
+        switch (choice) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &x);
+                stack_push(&stack_head, x);
+                break;
+
+            case 2:
+                x = stack_pop(&stack_head, &ok);
+                if (!ok)
+                    printf("Stack empty!\n");
+                else
+                    printf("Popped: %d\n", x);
+                break;
+
+            case 3:
+                x = stack_peek(stack_head, &ok);
+                if (!ok)
+                    printf("Stack empty!\n");
+                else
+                    printf("Top: %d\n", x);
+                break;
+
+            case 4:
+                display_list(stack_head);
+                break;
+
+            case 5:
+                printf("Enter value: ");
+                scanf("%d", &x);
+                enqueue(&q, x);
+                break;
+
+            case 6:
+                x = dequeue(&q, &ok);
+                if (!ok)
+                    printf("Queue empty!\n");
+                else
+                    printf("Dequeued: %d\n", x);
+                break;
+
+            case 7:
+                x = queue_front(&q, &ok);
+                if (!ok)
+                    printf("Queue empty!\n");
+                else
+                    printf("Front: %d\n", x);
+                break;
+
+            case 8:
+                display_list(q.head);
+                break;
+
+            case 9:
+                free_list(stack_head);
+                free_queue(&q);
+                return 0;
+
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    }
+
+    free_list(stack_head);
+    free_queue(&q);
+    return 0;
+}

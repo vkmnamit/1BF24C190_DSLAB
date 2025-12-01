@@ -1,21 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-typedef struct Node {
+struct Node {
     int data;
     struct Node *prev;
     struct Node *next;
-} Node;
+};
 
-Node *head = NULL;
+struct Node *head = NULL;
 
-Node* createNode(int value) {
-    Node *newNode = (Node*)malloc(sizeof(Node));
-    if (!newNode) {
-        printf("Memory allocation failed!\n");
-        exit(1);
-    }
+
+struct Node* createNode(int value) {
+    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->data = value;
     newNode->prev = NULL;
     newNode->next = NULL;
@@ -24,52 +20,52 @@ Node* createNode(int value) {
 
 
 void createList(int n) {
+    int value, i;
+    struct Node *temp, *newNode;
+
     if (n <= 0) {
-        printf("Number of nodes must be > 0\n");
+        printf("Number of nodes must be greater than 0\n");
         return;
     }
-
-    int value;
-    Node *temp, *newNode;
-    head = NULL;
 
     printf("Enter data for node 1: ");
     scanf("%d", &value);
     head = createNode(value);
 
     temp = head;
-    for (int i = 2; i <= n; i++) {
+
+    for (i = 2; i <= n; i++) {
         printf("Enter data for node %d: ", i);
         scanf("%d", &value);
-        newNode = createNode(value);
 
+        newNode = createNode(value);
         temp->next = newNode;
         newNode->prev = temp;
         temp = newNode;
     }
-    printf("Doubly linked list created with %d nodes.\n", n);
+
+    printf("Doubly linked list created.\n");
 }
 
 
 void insertLeftOf(int key, int newValue) {
+    struct Node *current = head;
+    struct Node *newNode = createNode(newValue);
+
     if (head == NULL) {
-        printf("List is empty. Cannot insert to the left of %d.\n", key);
+        printf("List is empty. Cannot insert.\n");
         return;
     }
-
-    Node *current = head;
 
     while (current != NULL && current->data != key) {
         current = current->next;
     }
 
     if (current == NULL) {
-        printf("Node with value %d not found. Insertion failed.\n", key);
+        printf("Node with value %d not found.\n", key);
+        free(newNode);
         return;
     }
-
-    Node *newNode = createNode(newValue);
-
 
     if (current == head) {
         newNode->next = head;
@@ -82,28 +78,26 @@ void insertLeftOf(int key, int newValue) {
         current->prev = newNode;
     }
 
-    printf("Inserted %d to the left of node with value %d.\n", newValue, key);
+    printf("Inserted %d to the left of %d.\n", newValue, key);
 }
 
 
 void deleteByValue(int key) {
+    struct Node *current = head;
+
     if (head == NULL) {
         printf("List is empty. Cannot delete.\n");
         return;
     }
-
-    Node *current = head;
-
 
     while (current != NULL && current->data != key) {
         current = current->next;
     }
 
     if (current == NULL) {
-        printf("Node with value %d not found. Deletion failed.\n", key);
+        printf("Node with value %d not found.\n", key);
         return;
     }
-
 
     if (current == head) {
         head = current->next;
@@ -113,24 +107,24 @@ void deleteByValue(int key) {
         current->prev->next = current->next;
     }
 
-
     if (current->next != NULL) {
         current->next->prev = current->prev;
     }
 
-    printf("Deleted node with value %d.\n", key);
     free(current);
+    printf("Deleted node with value %d.\n", key);
 }
 
 
 void displayList() {
+    struct Node *temp = head;
+
     if (head == NULL) {
         printf("List is empty.\n");
         return;
     }
 
-    Node *temp = head;
-    printf("List contents (from left to right): ");
+    printf("List contents: ");
     while (temp != NULL) {
         printf("%d ", temp->data);
         temp = temp->next;
@@ -140,35 +134,35 @@ void displayList() {
 
 
 int main() {
-    int choice, n, value, key;
+    int choice, n, key, value;
 
     while (1) {
         printf("\n--- Doubly Linked List Menu ---\n");
-        printf("1. Create doubly linked list\n");
-        printf("2. Insert a new node to the LEFT of a given node\n");
-        printf("3. Delete a node by value\n");
-        printf("4. Display the list\n");
+        printf("1. Create list\n");
+        printf("2. Insert to the LEFT of a node\n");
+        printf("3. Delete a node\n");
+        printf("4. Display list\n");
         printf("5. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                printf("How many nodes you want to create? ");
+                printf("Enter number of nodes: ");
                 scanf("%d", &n);
                 createList(n);
                 break;
 
             case 2:
-                printf("Enter the value of the node to the LEFT of which you want to insert: ");
+                printf("Enter existing node value: ");
                 scanf("%d", &key);
-                printf("Enter the new value to insert: ");
+                printf("Enter new node value: ");
                 scanf("%d", &value);
                 insertLeftOf(key, value);
                 break;
 
             case 3:
-                printf("Enter the value of the node you want to delete: ");
+                printf("Enter value of node to delete: ");
                 scanf("%d", &key);
                 deleteByValue(key);
                 break;
@@ -182,7 +176,7 @@ int main() {
                 return 0;
 
             default:
-                printf("Invalid choice. Please try again.\n");
+                printf("Invalid choice. Try again.\n");
         }
     }
 

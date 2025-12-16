@@ -1,22 +1,37 @@
 #include <stdio.h>
 
 int adj[10][10], visited[10], n;
+int queue[10], front = -1, rear = -1;
+
+
+void enqueue(int v) {
+    if (rear == 9)
+        return;
+    if (front == -1)
+        front = 0;
+    queue[++rear] = v;
+}
+
+int dequeue() {
+    if (front == -1 || front > rear)
+        return -1;
+    return queue[front++];
+}
 
 void bfs(int start) {
-    int queue[10], front = 0, rear = 0;
-    int i;
+    int i, v;
 
     visited[start] = 1;
-    queue[rear++] = start;
+    enqueue(start);
 
-    while (front < rear) {
-        int v = queue[front++];
+    while (front <= rear) {
+        v = dequeue();
         printf("%d ", v);
 
         for (i = 0; i < n; i++) {
             if (adj[v][i] == 1 && visited[i] == 0) {
                 visited[i] = 1;
-                queue[rear++] = i;
+                enqueue(i);
             }
         }
     }
